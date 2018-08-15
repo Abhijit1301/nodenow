@@ -1,1 +1,1 @@
-# nodenow
+This repo contains codes of assignments. Any feedback suggesting better ways to code or deal with web-development related problems in general with reference to any files in this repo is always welcome. Thank you!
