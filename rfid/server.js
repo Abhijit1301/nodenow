@@ -9,7 +9,7 @@ var server = http.createServer(function(req,res){
 });
 
 //Running HTTP server on environment's port
-server.listen(3000,'127.0.0.1');
+server.listen(80);
 
 //Unified server for both HTTP and HTTPS requests
 var unifiedServer = function(req,res){
