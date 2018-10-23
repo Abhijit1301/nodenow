@@ -3,6 +3,7 @@ var url = require('url');
 var stringDecoder = require('string_decoder').StringDecoder;
 var fs = require('fs');
 var con = require('./dbMySql');
+var path = require('path');
 
 //Instantiating HTTP server
 var server = http.createServer(function(req,res){
@@ -42,8 +43,18 @@ var unifiedServer = function(req,res){
         };
 
         //choose handler for requested path
-        var chosenHandler = typeof(router[path])!== "undefined" ? router[path] : handlers.notFound ;
-        console.log(chosenHandler,typeof(chosenHandler));
+        var chosenHandler;
+        if(typeof(router[path]) === "undefined"){
+            console.log("if case");
+            handlers.notFound(req,res);
+            return;
+        }
+        else{
+            chosenHandler = router[path];
+            console.log("else case");
+        }
+
+        //console.log(chosenHandler,typeof(chosenHandler));
         //call the handler
         chosenHandler(data,function(status,payload){
             var statusCode = typeof(status) !== "number" ? 200 : status;
@@ -62,10 +73,54 @@ var unifiedServer = function(req,res){
 var handlers = {};
 
 //notFound handler i.e no route found
-handlers.notFound = function(data,callback){
+handlers.notFound = function(request,response){
     //console.log(data);
-    callback(404);
+    var filePath = '.' + request.url;
+    if (filePath == './') {
+        filePath = './view/webView.html';
+    }
+
+    var extname = String(path.extname(filePath)).toLowerCase();
+    var mimeTypes = {
+        '.html': 'text/html',
+        '.js': 'text/javascript',
+        '.css': 'text/css',
+        '.json': 'application/json',
+        '.png': 'image/png',
+        '.jpg': 'image/jpg',
+        '.gif': 'image/gif',
+        '.wav': 'audio/wav',
+        '.mp4': 'video/mp4',
+        '.woff': 'application/font-woff',
+        '.ttf': 'application/font-ttf',
+        '.eot': 'application/vnd.ms-fontobject',
+        '.otf': 'application/font-otf',
+        '.svg': 'application/image/svg+xml'
+    };
+
+    var contentType = mimeTypes[extname] || 'application/octet-stream';
+
+    fs.readFile(filePath, function(error, content) {
+        if (error) {
+            if(error.code == 'ENOENT') {
+                fs.readFile('./404.html', function(error, content) {
+                    response.writeHead(200, { 'Content-Type': contentType });
+                    response.end(content, 'utf-8');
+                });
+            }
+            else {
+                response.writeHead(500);
+                response.end('Sorry, check with the site admin for error: '+error.code+' ..\n');
+                response.end();
+            }
+        }
+        else {
+            response.writeHead(200, { 'Content-Type': contentType });
+            response.end(content, 'utf-8');
+        }
+    });
 };
+
 
 //handler functions
 handlers.hardware = function(data,callback){
@@ -100,7 +155,7 @@ handlers.visual = function(data,callback){
     var payload = {};
     var sql = "";
 
-    if(data.queryStringObject.name === ""){
+    if(data.method === 'POST'){
         sql = "SELECT * FROM usersInfo WHERE status = 00;";
         con.query(sql,function(err,result){
             if(err)
@@ -108,7 +163,9 @@ handlers.visual = function(data,callback){
             else{
                 console.log(result);
                 if(result.length > 0){
-                    payload.seriel = result[0].rfidSeriel;
+                    payload.status = 1;
+                    for(var i = 0; i < result.length; i++)
+                        payload.seriel = result[0].rfidSeriel;
                     callback(200, payload);   
                 }
                 else{
@@ -117,6 +174,7 @@ handlers.visual = function(data,callback){
                         if(err1)
                             callback(405,{msg:"error occurred while getting presence details"});
                         else{
+                            payload.status = 2;
                             for(var i = 0; i < result1.length; i++){
                                 payload.push({name:result1[i].name, seriel : result1[i].seriel, status: result1[i].status});
                             }
