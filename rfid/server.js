@@ -138,7 +138,7 @@ handlers.hardware = function(data,callback){
             });
         }
         else{
-            sql = "UPDATE usersInfo SET presence = 1 WHERE rfidSeriel = '"+data.queryStringObject.seriel+"' AND status = 01;";
+            sql = "UPDATE usersInfo SET presence = 1 WHERE rfidSeriel = '"+parseInt(data.queryStringObject.seriel)+"' AND status = 01;";
             con.query(sql,function(err1,result1){
                 if(err1)
                     callback(405,{msg:"error occurred while updating presence column"});
@@ -186,8 +186,10 @@ handlers.visual = function(data,callback){
         });    
     }
     else{
-        sql = "UPDATE usersInfo SET status = 01 AND name = '"+data.queryStringObject.name+"' WHERE rfidSeriel = '"+data.queryStringObject.seriel+"';";
+        sql = "UPDATE usersInfo SET status = 01 AND name = '"+data.queryStringObject.name+"' WHERE rfidSeriel = "+data.queryStringObject.seriel+";";
         con.query(sql,function(err1,result1){
+            console.log('\n updating name and seriel')
+            console.log(result1);
             if(err1)
                 callback(405,{msg:"error occurred while updating name & status column"});
             else

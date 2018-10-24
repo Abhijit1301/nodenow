@@ -3,16 +3,21 @@
 <head>
 	<title>RFID based Identification</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 	<link rel = "stylesheet" type="text/css" href = "/view/webView.css"></link>
 </head>
 <body>
-	<header>
-		<div>
-			hi there!
+	<header class="w3-card-4 w3-black w3-container">
+		<div class = "header_div">
+			RFID Portal
 		</div>
 	</header>
-	<footer>
-		
+	<footer class="w3-teal w3-card-4 w3-container" style="margin-top:30px; width:100%;">
+		<div id="developperinfo" >
+			<ul class="w3-center" style="list-style-type:none">Developped by:  
+				<li>Papun-Kun</li>
+			</ul>
+		</div>
 	</footer>
 
 	<div id="myModal" class="modal fade" role="dialog">
@@ -35,6 +40,10 @@
                     	</button>
         			</div>
                       <div class="form-group">
+                          <label for="">Seriel <span class="required">*</span></label>
+                          <input readonly type="text" class="form-control" name="seriel" id="seriel" required="required">
+                      </div><!-- /.form-group -->
+                      <div class="form-group">
                           <label for="">Name <span class="required">*</span></label>
                           <input type="text" class="form-control" name="name" id="name" required="required">
                       </div><!-- /.form-group -->
@@ -48,9 +57,9 @@
         </div>
       </div>
     
-<!--     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
- -->
- <script src = "/view/jQuery.js" type="text/javascript"></script>    
+
+	 <script src = "/view/jQuery.js" type="text/javascript"></script>    
+    
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
 	

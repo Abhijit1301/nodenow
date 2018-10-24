@@ -10,6 +10,7 @@ $(document).ready(function(){
 			console.log(result);
 			//result = JSON.parse(result);
 			if(result.status === 1){
+				$("#seriel").val(result.seriel);
 				$("#myModal").modal('show');
 			}
 		});
