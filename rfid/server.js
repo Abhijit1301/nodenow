@@ -32,16 +32,25 @@ var unifiedServer = function(req,res){
     //Get the header object
     var headers = req.headers;
 
-    //req.on('end',function(){
+    //Get payload stream
+    var decoder = new stringDecoder('UTF-8');
+    var buffer = '';
+    req.on('data',function(data){
+        buffer += decoder.write(data);
+        //console.log(decoder.write(data)+"\n");
+    });
+
+    req.on('end',function(){
+        buffer += decoder.end();
 
         //prepare data object for handler
         var data = {
             path : path,
             method : method,
             queryStringObject : queryStringObject,
-            headers : headers
+            headers : headers,
+            payload : buffer,
         };
-
         //choose handler for requested path
         var chosenHandler;
         if(typeof(router[path]) === "undefined"){
@@ -54,7 +63,6 @@ var unifiedServer = function(req,res){
             console.log("else case");
         }
 
-        //console.log(chosenHandler,typeof(chosenHandler));
         //call the handler
         chosenHandler(data,function(status,payload){
             var statusCode = typeof(status) !== "number" ? 200 : status;
@@ -67,7 +75,8 @@ var unifiedServer = function(req,res){
             res.writeHead(statusCode);
             res.end(payloadString);
         });
-    //});
+    });
+    
 }
 //handler object 
 var handlers = {};
@@ -124,26 +133,27 @@ handlers.notFound = function(request,response){
 
 //handler functions
 handlers.hardware = function(data,callback){
-    console.log(data);
-    var sql = "SELECT * FROM usersInfo WHERE rfidSeriel = '"+data.queryStringObject.seriel+"';";
+    console.log("in hardware route");
+    console.log(data.payload);
+    var sql = "SELECT * FROM usersInfo WHERE rfidSeriel = "+parseInt(data.payload)+"";
     con.query(sql,function(err,result){
         console.log(result);
         if(result.length == 0){
-            sql = "INSERT into usersInfo (rfidSeriel, presence, status) VALUES ('"+data.queryStringObject.seriel+"',0,00);";
+            sql = "INSERT into usersInfo (rfidSeriel, presence, status) VALUES ("+parseInt(data.payload)+",0,0);";
             con.query(sql,function(err1,result1){
                 if(err1)
-                    callback(405,{msg:"error occurred while inserting values into database"});
+                    callback(405,{status:10, msg:"error occurred while inserting values into database"});
                 else
-                    callback(200,{msg:"seriel added successfully"});
+                    callback(200,{status:10, msg:"seriel added successfully"});
             });
         }
         else{
-            sql = "UPDATE usersInfo SET presence = 1 WHERE rfidSeriel = '"+parseInt(data.queryStringObject.seriel)+"' AND status = 01;";
+            sql = "UPDATE usersInfo SET presence = 1 WHERE rfidSeriel = '"+parseInt(data.payload)+"' AND status = 1;";
             con.query(sql,function(err1,result1){
                 if(err1)
-                    callback(405,{msg:"error occurred while updating presence column"});
+                    callback(405,{status : 10, msg:"error occurred while updating presence column"});
                 else
-                    callback(200,{msg:"presence updated successfully"});
+                    callback(200,{status: 10, msg:"presence updated successfully"});
             });
         }
     });
@@ -151,8 +161,10 @@ handlers.hardware = function(data,callback){
 
 //handler functions
 handlers.visual = function(data,callback){
-    console.log(data);
+    console.log("in visual route");
+    console.log(data.method, data.queryStringObject);
     var payload = {};
+    var arr = [];
     var sql = "";
 
     if(data.method === 'POST'){
@@ -165,7 +177,8 @@ handlers.visual = function(data,callback){
                 if(result.length > 0){
                     payload.status = 1;
                     for(var i = 0; i < result.length; i++)
-                        payload.seriel = result[0].rfidSeriel;
+                        arr.push({seriel : result[0].rfidSeriel}) ;
+                    payload.info = arr;
                     callback(200, payload);   
                 }
                 else{
@@ -176,8 +189,9 @@ handlers.visual = function(data,callback){
                         else{
                             payload.status = 2;
                             for(var i = 0; i < result1.length; i++){
-                                payload.push({name:result1[i].name, seriel : result1[i].seriel, status: result1[i].status});
+                                arr.push({name:result1[i].name, seriel : result1[i].seriel, status: result1[i].status});
                             }
+                            payload.info = arr;
                             callback(200, payload);
                         }
                     });
@@ -186,7 +200,8 @@ handlers.visual = function(data,callback){
         });    
     }
     else{
-        sql = "UPDATE usersInfo SET status = 01 AND name = '"+data.queryStringObject.name+"' WHERE rfidSeriel = "+data.queryStringObject.seriel+";";
+        console.log('got data from form submission',data.queryStringObject.name, parseInt(data.queryStringObject.seriel));
+        sql = "UPDATE usersInfo SET status = 01, name = '"+data.queryStringObject.name+"' WHERE rfidSeriel = "+parseInt(data.queryStringObject.seriel);
         con.query(sql,function(err1,result1){
             console.log('\n updating name and seriel')
             console.log(result1);
