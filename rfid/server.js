@@ -135,6 +135,7 @@ handlers.notFound = function(request,response){
 handlers.hardware = function(data,callback){
     console.log("in hardware route\n");
     console.log('printing payload',data.payload);
+    console.log('\n data type of payload',typeof(data.payload));
     var sql = "SELECT * FROM usersinfo WHERE rfidSeriel = "+data.payload+"";
     con.query(sql,function(err,result){
         console.log('\nprinting result',result);
