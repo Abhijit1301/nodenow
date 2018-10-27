@@ -133,15 +133,17 @@ handlers.notFound = function(request,response){
 
 //handler functions
 handlers.hardware = function(data,callback){
-    console.log("in hardware route");
-    console.log(data.payload);
+    console.log("in hardware route\n");
+    console.log('printing payload',data.payload);
     var sql = "SELECT * FROM usersInfo WHERE rfidSeriel = "+parseInt(data.payload)+"";
     con.query(sql,function(err,result){
-        console.log(result);
+        console.log('\nprinting payload',result);
         if(err){
+            console.log("error while first db call");
             callback(405,{status:10, msg:"error while first db call"});
         }
         else if(result.length === 0){
+            console.log('result.length = 0 case');
             sql = "INSERT into usersInfo (rfidSeriel, presence, status) VALUES ("+parseInt(data.payload)+",0,0);";
             con.query(sql,function(err1,result1){
                 if(err1)
@@ -151,6 +153,8 @@ handlers.hardware = function(data,callback){
             });
         }
         else{
+            console.log('result.length > 0 case');
+
             sql = "UPDATE usersInfo SET presence = 1 WHERE rfidSeriel = '"+parseInt(data.payload)+"' AND status = 1;";
             con.query(sql,function(err1,result1){
                 if(err1)
