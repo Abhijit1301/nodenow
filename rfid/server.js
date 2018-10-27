@@ -137,8 +137,11 @@ handlers.hardware = function(data,callback){
     console.log(data.payload);
     var sql = "SELECT * FROM usersInfo WHERE rfidSeriel = "+parseInt(data.payload)+"";
     con.query(sql,function(err,result){
-        //console.log(result);
-        //if(result1.length == 0){
+        console.log(result);
+        if(err){
+            callback(405,{status:10, msg:"error while first db call"});
+        }
+        else if(result.length === 0){
             sql = "INSERT into usersInfo (rfidSeriel, presence, status) VALUES ("+parseInt(data.payload)+",0,0);";
             con.query(sql,function(err1,result1){
                 if(err1)
