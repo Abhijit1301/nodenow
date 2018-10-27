@@ -135,7 +135,7 @@ handlers.notFound = function(request,response){
 handlers.hardware = function(data,callback){
     console.log("in hardware route\n");
     console.log('printing payload',data.payload);
-    var sql = "SELECT * FROM usersInfo WHERE rfidSeriel = "+data.payload+"";
+    var sql = "SELECT * FROM usersinfo WHERE rfidSeriel = "+data.payload+"";
     con.query(sql,function(err,result){
         console.log('\nprinting result',result);
         if(err){
@@ -144,7 +144,7 @@ handlers.hardware = function(data,callback){
         }
         else if(result.length === 0){
             console.log('result.length = 0 case');
-            sql = "INSERT into usersInfo (rfidSeriel, presence, status) VALUES ("+data.payload+",0,0)";
+            sql = "INSERT into usersinfo (rfidSeriel, presence, status) VALUES ("+data.payload+",0,0)";
             con.query(sql,function(err1,result1){
                 if(err1)
                     callback(405,{status:10, msg:"error occurred while inserting values into database"});
@@ -155,7 +155,7 @@ handlers.hardware = function(data,callback){
         else{
             console.log('result.length > 0 case');
 
-            sql = "UPDATE usersInfo SET presence = 1 WHERE rfidSeriel = '"+data.payload+"' AND status = 1";
+            sql = "UPDATE usersinfo SET presence = 1 WHERE rfidSeriel = '"+data.payload+"' AND status = 1";
             con.query(sql,function(err1,result1){
                 if(err1)
                     callback(405,{status : 10, msg:"error occurred while updating presence column"});
@@ -175,7 +175,7 @@ handlers.visual = function(data,callback){
     var sql = "";
 
     if(data.method === 'POST'){
-        sql = "SELECT * FROM usersInfo WHERE status = 0";
+        sql = "SELECT * FROM usersinfo WHERE status = 0";
         con.query(sql,function(err,result){
             if(err)
                 callback(405,{msg:"failed to connect to db, visual case"});
@@ -189,7 +189,7 @@ handlers.visual = function(data,callback){
                     callback(200, payload);   
                 }
                 else{
-                    sql = "SELECT * FROM usersInfo WHERE presence = 1 AND status = 11"
+                    sql = "SELECT * FROM usersinfo WHERE presence = 1 AND status = 11"
                     con.query(sql,function(err1,result1){
                         if(err1)
                             callback(405,{msg:"error occurred while getting presence details"});
@@ -208,7 +208,7 @@ handlers.visual = function(data,callback){
     }
     else{
         console.log('got data from form submission',data.queryStringObject.name, parseInt(data.queryStringObject.seriel));
-        sql = "UPDATE usersInfo SET status = 01, name = '"+data.queryStringObject.name+"' WHERE rfidSeriel = "+data.queryStringObject.seriel;
+        sql = "UPDATE usersinfo SET status = 01, name = '"+data.queryStringObject.name+"' WHERE rfidSeriel = "+data.queryStringObject.seriel;
         con.query(sql,function(err1,result1){
             console.log('\n updating name and seriel')
             console.log(result1);
