@@ -11,7 +11,7 @@ var server = http.createServer(function(req,res){
 });
 
 //Running HTTP server on environment's port
-server.listen(8080);
+server.listen(3000);
 
 //Unified server for both HTTP and HTTPS requests
 var unifiedServer = function(req,res){
@@ -137,8 +137,8 @@ handlers.hardware = function(data,callback){
     console.log(data.payload);
     var sql = "SELECT * FROM usersInfo WHERE rfidSeriel = "+parseInt(data.payload)+"";
     con.query(sql,function(err,result){
-        console.log(result);
-        if(result.length == 0){
+        //console.log(result);
+        //if(result1.length == 0){
             sql = "INSERT into usersInfo (rfidSeriel, presence, status) VALUES ("+parseInt(data.payload)+",0,0);";
             con.query(sql,function(err1,result1){
                 if(err1)
