@@ -136,7 +136,7 @@ handlers.hardware = function(data,callback){
     console.log("in hardware route\n");
     console.log('printing payload',data.payload);
     console.log('\n data type of payload',typeof(data.payload));
-    var sql = "SELECT * FROM usersinfo WHERE rfidSeriel = "+data.payload+"";
+    var sql = "SELECT * FROM usersinfo WHERE rfidSeriel = '"+data.payload+"'";
     con.query(sql,function(err,result){
         console.log('\nprinting result',result);
         if(err){
@@ -145,7 +145,7 @@ handlers.hardware = function(data,callback){
         }
         else if(result.length === 0){
             console.log('result.length = 0 case');
-            sql = "INSERT into usersinfo (rfidSeriel, presence, status) VALUES ("+data.payload+",0,0)";
+            sql = "INSERT into usersinfo (rfidSeriel, presence, status) VALUES ('"+data.payload+"',0,0)";
             con.query(sql,function(err1,result1){
                 if(err1)
                     callback(405,{status:10, msg:"error occurred while inserting values into database"});
@@ -155,8 +155,9 @@ handlers.hardware = function(data,callback){
         }
         else{
             console.log('result.length > 0 case');
+            console.log('printing result\n',JSON.stringify(result),'\n');
 
-            sql = "UPDATE usersinfo SET presence = 1 WHERE rfidSeriel = '"+data.payload+"' AND status = 1";
+            sql = "UPDATE usersinfo SET presence = 1, status = 11 WHERE rfidSeriel = '"+data.payload+"' AND status = 1";
             con.query(sql,function(err1,result1){
                 if(err1)
                     callback(405,{status : 10, msg:"error occurred while updating presence column"});
@@ -179,8 +180,9 @@ handlers.visual = function(data,callback){
         sql = "SELECT * FROM usersinfo WHERE status = 0";
         con.query(sql,function(err,result){
             if(err)
-                callback(405,{msg:"failed to connect to db, visual case"});
+                callback(405,{status : 0, info:[{msg:"failed to connect to db, visual case"}] });
             else{
+                console.log('in visual, method POST, before result length checking,\n');
                 console.log(result);
                 if(result.length > 0){
                     payload.status = 1;
@@ -190,10 +192,10 @@ handlers.visual = function(data,callback){
                     callback(200, payload);   
                 }
                 else{
-                    sql = "SELECT * FROM usersinfo WHERE presence = 1 AND status = 11"
+                    sql = "SELECT * FROM usersinfo WHERE status = 11"
                     con.query(sql,function(err1,result1){
                         if(err1)
-                            callback(405,{msg:"error occurred while getting presence details"});
+                            callback(405,{status : 0, info : [{msg:"error occurred while getting presence details"}] });
                         else{
                             payload.status = 2;
                             for(var i = 0; i < result1.length; i++){
@@ -209,15 +211,28 @@ handlers.visual = function(data,callback){
     }
     else{
         console.log('got data from form submission',data.queryStringObject.name, parseInt(data.queryStringObject.seriel));
-        sql = "UPDATE usersinfo SET status = 01, name = '"+data.queryStringObject.name+"' WHERE rfidSeriel = "+data.queryStringObject.seriel;
-        con.query(sql,function(err1,result1){
-            console.log('\n updating name and seriel')
-            console.log(result1);
-            if(err1)
-                callback(405,{msg:"error occurred while updating name & status column"});
-            else
-                callback(200,{msg:"name updated successfully"});
-        });
+        if(data.queryStringObject.name === "donotadd"){
+            sql = "DELETE FROM usersinfo SET WHERE rfidSeriel = '"+data.queryStringObject.seriel+"'";
+            con.query(sql,function(err1,result1){
+                console.log('\n deleting row result = \n')
+                console.log(result1);
+                if(err1)
+                    callback(405,{msg:"error occurred while deleting row"});
+                else
+                    callback(200,{msg:"row deleted successfully"});
+            });
+        }
+        else{
+            sql = "UPDATE usersinfo SET status = 1, name = '"+data.queryStringObject.name+"' WHERE rfidSeriel = '"+data.queryStringObject.seriel+"'";
+            con.query(sql,function(err1,result1){
+                console.log('\n updating name and seriel, result = \n')
+                console.log(result1);
+                if(err1)
+                    callback(405,{msg:"error occurred while updating name & status column"});
+                else
+                    callback(200,{msg:"name updated successfully"});
+            });
+        }
     }        
 };
 
