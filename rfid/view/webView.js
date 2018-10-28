@@ -34,7 +34,7 @@ $(document).ready(function(){
 		if(selValue === "2")
 			name = "donotadd";
 		$.get("/visual?name="+name+"&seriel="+seriel+"", function(reply){
-			alert(reply.message);
+			alert(reply.msg);
 		});
 		e.preventDefault();
 	});
@@ -53,7 +53,7 @@ $(document).ready(function(){
 				}
 				else if(result.status === 0){
 					posting = true;
-					alert(result.info[0].message);
+					alert(result.info[0].msg);
 				}
 				else{
 					posting = true;
@@ -74,8 +74,8 @@ $(document).ready(function(){
 							else
 								seriel += 'x';
 						}
-						__htmls = '<div class="col-xl-3">'+
-									'<div class="card" style="width: 18rem;">'+
+						__htmls = '<div class="col-xl-6">'+
+									'<div class="card" style="width:17rem">'+
 									  '<img class="card-img-top" src="./view/profile.png" alt="Card image cap">'+
 									    '<div class="card-body">'+
 									      '<h5 class="card-title">'+result.info[i].name+'</h5>'+
