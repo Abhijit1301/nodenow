@@ -192,14 +192,14 @@ handlers.visual = function(data,callback){
                     callback(200, payload);   
                 }
                 else{
-                    sql = "SELECT * FROM usersinfo WHERE status = 11"
+                    sql = "SELECT * FROM usersinfo WHERE status <> 0"
                     con.query(sql,function(err1,result1){
                         if(err1)
                             callback(405,{status : 0, info : [{msg:"error occurred while getting presence details"}] });
                         else{
                             payload.status = 2;
                             for(var i = 0; i < result1.length; i++){
-                                arr.push({name:result1[i].name, seriel : result1[i].seriel, status: result1[i].status});
+                                arr.push({name:result1[i].name, seriel : result1[i].seriel, presence: result1[i].presence});
                             }
                             payload.info = arr;
                             callback(200, payload);
@@ -211,8 +211,9 @@ handlers.visual = function(data,callback){
     }
     else{
         console.log('got data from form submission',data.queryStringObject.name, parseInt(data.queryStringObject.seriel));
+        console.log('\ntypeof name = ',typeof(data.queryStringObject.name));
         if(data.queryStringObject.name === "donotadd"){
-            sql = "DELETE FROM usersinfo SET WHERE rfidSeriel = '"+data.queryStringObject.seriel+"'";
+            sql = "DELETE FROM usersinfo WHERE rfidSeriel = '"+data.queryStringObject.seriel+"'";
             con.query(sql,function(err1,result1){
                 console.log('\n deleting row result = \n')
                 console.log(result1);

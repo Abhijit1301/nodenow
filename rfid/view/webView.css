@@ -1,3 +1,30 @@
-body{
-	
+.header_div{
+	text-align: center;
+	margin : auto;
+	padding: 16px;
+	font-weight: bold;
+	font-size: 1.5em;
+	position: fixed;
+}
+header{
+	position: fixed;
+	top: 0px;
+}
+
+footer{
+	position: fixed;
+	bottom: 0px;
+}
+
+#wrap{
+	overflow-y: auto;
+	overflow-x: hidden;
+	position: relative;
+	height: 500px; 
+}
+
+.row{
+	position: absolute;
+	top : 1px;
+	bottom: 1 px;
 }
