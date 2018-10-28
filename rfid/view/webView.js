@@ -61,6 +61,7 @@ $(document).ready(function(){
 
 					$(".row").empty();
 					for(var i = 0; i < result.info.length; i++){
+						seriel = '';
 						if(result.info[i].presence === 1)
 							presence = "Present";
 						else
@@ -69,7 +70,7 @@ $(document).ready(function(){
 						len = result.info[i].seriel.length;
 						for(var j = 1; j <= len; j++){
 							if(j > len - 4)
-								seriel += result.info[i].seriel[j];
+								seriel += result.info[i].seriel[j - 1];
 							else
 								seriel += 'x';
 						}
