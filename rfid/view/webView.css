@@ -20,7 +20,9 @@ footer{
 	overflow-y: auto;
 	overflow-x: hidden;
 	position: relative;
-	height: 500px; 
+	height: 511px; 
+	background-size: contain;
+	background-image: url("./bg.jpeg");
 }
 
 .row{
