@@ -199,7 +199,7 @@ handlers.visual = function(data,callback){
                         else{
                             payload.status = 2;
                             for(var i = 0; i < result1.length; i++){
-                                arr.push({name:result1[i].name, seriel : result1[i].seriel, presence: result1[i].presence});
+                                arr.push({name:result1[i].name, seriel : result1[i].rfidSeriel, presence: result1[i].presence});
                             }
                             payload.info = arr;
                             callback(200, payload);
